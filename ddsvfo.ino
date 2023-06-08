@@ -148,7 +148,7 @@ void CheckEncoder(void) {
     #endif
 
     //
-    //  Calculate the delta (how many click positive or negaitve)
+    //  Calculate the delta (how many click positive or negative)
     //
     encoder_delta = current_count - prev_encoder_count;
     
@@ -203,11 +203,6 @@ void CheckIncrement (){
   }
 }
 
-void setupDDS() {
-  dds.init();
-  // dds.trim(125000000);  // Optional oscilattor trim
-}
-
 void setup()
 {
   delay(250); // wait for the OLED to power up
@@ -221,7 +216,7 @@ void setup()
   display.setTextColor(SH110X_WHITE);
 
   // setup ISR for encoder pins
-  PCICR |= (1 << PCIE2);                    //sets interupt pins D2 D3
+  PCICR |= (1 << PCIE2);                    //sets interrupt pins D2 D3
   PCMSK2 |= (1 << PCINT18) | (1 << PCINT19);         
   sei();
 
@@ -229,7 +224,7 @@ void setup()
   pinMode(ENCODER_BTN,INPUT); digitalWrite(ENCODER_BTN,HIGH); // Encoder switch - STEP
 
   // setup DDS
-  setupDDS();
+  dds.init();
 }
 
 void loop()
