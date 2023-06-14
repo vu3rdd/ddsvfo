@@ -136,9 +136,10 @@ void displayFreq(int_fast32_t freq) {
     delay(1);
 }
 
-void CheckEncoder(void) {
+int_fast32_t CheckEncoder(void) {
   int current_count = encoder_count;  // grab the current encoder_count
   long encoder_delta = 0;
+  int_fast32_t current_freq = freq;
 
   if (current_count != prev_encoder_count) {  // if there is any change in the encoder coount
     
@@ -155,23 +156,25 @@ void CheckEncoder(void) {
     //
     //  Calculate and display the new frequency
     //
-    freq = freq + (encoder_delta * increment);
-    if (freq >= 30000000L) {
-        freq = 30000000L;
+    current_freq += (encoder_delta * increment);
+    if (current_freq >= 30000000L) {
+        current_freq = 30000000L;
     }
-    if (freq <= 0) {
-        freq = 0;
+    if (current_freq <= 0) {
+        current_freq = 0;
     }
     //dds.setFrequency(freq);
     //displayFrequency(freq);
     
     #ifdef DEBUG
-      sprintf(debugmsg, "current_count: %d, New Freq: %ld", current_count, freq);
+      sprintf(debugmsg, "current_count: %d, New Freq: %ld", current_count, current_freq);
       Serial.println(debugmsg);
     #endif
 
     prev_encoder_count = current_count;  // save the current_count for next time around
   }
+
+  return current_freq;
 }
 
 void CheckIncrement (){
@@ -230,7 +233,10 @@ void setup()
 void loop()
 {
   displayFreq(freq);
-  dds.setFrequency(freq);
-  CheckEncoder();
+  int_fast32_t f = CheckEncoder();
+  if (f != freq) {
+      dds.setFrequency(f);
+      freq = f;
+  }
   CheckIncrement();
 }
